@@ -8,9 +8,9 @@ import {
 import * as jose from "jose";
 
 export async function POST(request: Request) {
-  const body = await request.formData();
-  const code = body.get("code") as string;
-  const platform = (body.get("platform") as string) || "native"; // Default to native if not specified
+  const body = await request.json();
+  const code = body.code as string;
+  const platform = (body.platform as string) || "native"; // Default to native if not specified
 
   if (!code) {
     return Response.json(
