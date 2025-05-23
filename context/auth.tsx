@@ -61,6 +61,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [response]);
 
+  React.useEffect(() => {
+    const restoreSession = async () => {
+      setIsLoading(true);
+      try {
+        if (isWeb) {
+          const sessionResponse = await fetch(`${BASE_URL}/api/auth/session`, {
+            method: "GET",
+            credentials: "include", // This includes cookies in the request
+          });
+
+          if (sessionResponse.ok) {
+            const userData = await sessionResponse.json();
+            setUser(userData as AuthUser);
+          }
+        } else {
+          //mobile
+        }
+      } catch (e) {
+        console.log(e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    restoreSession();
+  }, [isWeb]);
+
   const handleResponse = async () => {
     // This function is called when Google redirects back to our app
     // The response contains the authorization code that we'll exchange for tokens
