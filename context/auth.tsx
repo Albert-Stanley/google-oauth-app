@@ -1,10 +1,9 @@
-import { BASE_URL, TOKEN_KEY_NAME } from "@/constants";
 import { tokenCache } from "@/utils/cache";
+import { BASE_URL, TOKEN_KEY_NAME } from "@/utils/constants";
 import {
   AuthError,
   AuthRequestConfig,
   DiscoveryDocument,
-  exchangeCodeAsync,
   makeRedirectUri,
   useAuthRequest,
 } from "expo-auth-session";
@@ -55,47 +54,88 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<AuthError | null>(null);
   const [request, response, promptAsync] = useAuthRequest(config, discovery);
+  const isWeb = Platform.OS === "web";
 
   React.useEffect(() => {
     handleResponse();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [response]);
 
   const handleResponse = async () => {
-    const isWeb = Platform.OS === "web";
-
+    // This function is called when Google redirects back to our app
+    // The response contains the authorization code that we'll exchange for tokens
     if (response?.type === "success") {
       try {
         setIsLoading(true);
-
+        // Extract the authorization code from the response
+        // This code is what we'll exchange for access and refresh tokens
         const { code } = response.params;
 
-        const tokenResponse = await exchangeCodeAsync(
-          {
-            code: code,
-            extraParams: {
-              platform: Platform.OS,
-            },
-            clientId: "google",
-            redirectUri: makeRedirectUri(),
-          },
-          discovery
-        );
+        // Create form data to send to our token endpoint
+        // We include both the code and platform information
+        // The platform info helps our server handle web vs native differently
+        const formData = new FormData();
+        formData.append("code", code);
 
-        console.log("token response", tokenResponse);
+        // Add platform information for the backend to handle appropriately
+        if (isWeb) {
+          formData.append("platform", "web");
+        }
+
+        console.log("request", request);
+
+        // Get the code verifier from the request object
+        // This is the same verifier that was used to generate the code challenge
+        if (request?.codeVerifier) {
+          formData.append("code_verifier", request.codeVerifier);
+        } else {
+          console.warn("No code verifier found in request object");
+        }
+
+        // Send the authorization code to our token endpoint
+        // The server will exchange this code with Google for access and refresh tokens
+        // For web: credentials are included to handle cookies
+        // For native: we'll receive the tokens directly in the response
+        const tokenResponse = await fetch(`${BASE_URL}/api/auth/token`, {
+          method: "POST",
+          body: formData,
+          credentials: isWeb ? "include" : "same-origin", // Include cookies for web
+        });
 
         if (isWeb) {
-          const sessionResponse = await fetch(`${BASE_URL}/api/auth/session`, {
-            method: "GET",
-            credentials: "include",
-          });
+          // For web: The server sets the tokens in HTTP-only cookies
+          // We just need to get the user data from the response
+          const userData = await tokenResponse.json();
+          if (userData.success) {
+            // Fetch the session to get user data
+            // This ensures we have the most up-to-date user information
+            console.log("user data was received", userData);
 
-          if (sessionResponse.ok) {
-            const sessionData = await sessionResponse.json();
-            setUser(sessionData as AuthUser);
+            const sessionResponse = await fetch(
+              `${BASE_URL}/api/auth/session`,
+              {
+                method: "GET",
+                credentials: "include",
+              }
+            );
+
+            if (sessionResponse.ok) {
+              const sessionData = await sessionResponse.json();
+              setUser(sessionData as AuthUser);
+            } else {
+              console.error("Failed to fetch session.");
+            }
+          } else {
+            console.error("Token exchange failed for web:", userData);
           }
         } else {
-          const accessToken = tokenResponse.accessToken;
+          const token = await tokenResponse.json();
+          const accessToken = token.accessToken;
 
+          if (!accessToken) {
+            console.log("No access token received");
+            return;
+          }
           setAccessToken(accessToken);
 
           // save to local storage
@@ -106,6 +146,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           //get user info
           const decoded = jose.decodeJwt(accessToken);
           setUser(decoded as AuthUser);
+
+          console.log("decoded", decoded);
         }
       } catch (e) {
         console.log(e);

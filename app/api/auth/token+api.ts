@@ -1,17 +1,20 @@
 import {
+  COOKIE_MAX_AGE,
+  COOKIE_NAME,
+  COOKIE_OPTIONS,
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
   GOOGLE_REDIRECT_URI,
   JWT_EXPIRATION_TIME,
   JWT_SECRET,
-} from "@/constants";
+} from "@/utils/constants";
 import * as jose from "jose";
 
 export async function POST(request: Request) {
-  const body = await request.json();
-  const code = body.code as string;
-  const platform = (body.platform as string) || "native"; // Default to native if not specified
-
+  const body = await request.formData();
+  const code = (body as any).get("code") as string;
+  const platform = ((body as any).get("platform") as string) || "native";
+  // const codeVerifier = (body as any).get("code_verifier") as string;
   if (!code) {
     return Response.json(
       { error: "Missing authorization code" },
@@ -28,6 +31,7 @@ export async function POST(request: Request) {
       redirect_uri: GOOGLE_REDIRECT_URI,
       grant_type: "authorization_code",
       code: code,
+      // code_verifier: codeVerifier,
     }),
   });
 
@@ -60,10 +64,25 @@ export async function POST(request: Request) {
     .sign(new TextEncoder().encode(JWT_SECRET));
 
   if (platform === "web") {
-    return Response.json({
-      access_token: accessToken,
+    const response = Response.json({
+      success: true,
+      issuedAt: issuedAt,
+      expiresAt: issuedAt + COOKIE_MAX_AGE,
     });
 
-    // return Response.json({ access_token: accessToken, refresh_token: refreshToken, });
+    // Set the access token in an HTTP-only cookie
+    response.headers.set(
+      "Set-Cookie",
+      `${COOKIE_NAME}=${accessToken}; Max-Age=${COOKIE_OPTIONS.maxAge}; Path=${
+        COOKIE_OPTIONS.path
+      }; ${COOKIE_OPTIONS.httpOnly ? "HttpOnly;" : ""} ${
+        COOKIE_OPTIONS.secure ? "Secure;" : ""
+      } SameSite=${COOKIE_OPTIONS.sameSite}`
+    );
+
+    return response;
   }
+
+  return Response.json({ accessToken });
+  //return Response.json({ access_token: accessToken, refresh_token: refreshToken, });
 }

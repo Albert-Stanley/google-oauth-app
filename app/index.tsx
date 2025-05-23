@@ -1,6 +1,6 @@
 import LoginForm from "@/components/LoginForm";
 import { useAuth } from "@/context/auth";
-import { ActivityIndicator, Button, Text, View } from "react-native";
+import { ActivityIndicator, Button, Image, Text, View } from "react-native";
 
 export default function Index() {
   const { user, isLoading, signOut } = useAuth();
@@ -31,8 +31,15 @@ export default function Index() {
         alignItems: "center",
       }}
     >
-      <Text>{user.id}</Text>
+      {/* Imagem do usuário */}
+      <Image
+        source={{ uri: user.picture }}
+        style={{ width: 96, height: 96, borderRadius: 48, marginBottom: 16 }}
+      />
+      <Text>{user.sub}</Text>
       <Text>{user.name}</Text>
+      <Text>{user.email}</Text>
+
       <Button title="Logout" onPress={() => signOut()} />
     </View>
   );
