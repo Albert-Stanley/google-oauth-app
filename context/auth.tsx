@@ -31,7 +31,7 @@ const AuthContext = React.createContext({
   user: null as AuthUser | null,
   signIn: () => {},
   signOut: () => {},
-  fetchWithAuth: async (url: string, options?: RequestInit) =>
+  fetchWithAuth: (url: string, options: RequestInit) =>
     Promise.resolve(new Response()),
   isLoading: false,
   error: null as AuthError | null,
@@ -219,9 +219,62 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log(e);
     }
   };
-  const signOut = async () => {};
+  const signOut = async () => {
+    if (isWeb) {
+      //For web: Call logout endpoint to clear the cookie
+      try {
+        await fetch(`${BASE_URL}/api/auth/logout`, {
+          method: "POST",
+          credentials: "include",
+        });
+      } catch (error) {
+        console.log("Error during the web logout: ", error);
+      }
+    } else {
+      //For native: Clear both tokens from cache
+      await tokenCache?.deleteToken("accessToken");
+    }
 
-  const fetchWithAuth = async (url: string, options?: RequestInit) => {};
+    //Clear state
+    setUser(null);
+    setAccessToken("");
+  };
+
+  const fetchWithAuth = async (url: string, options: RequestInit) => {
+    if (isWeb) {
+      // For web: Fetch with credentials to include cookies
+      const response = await fetch(url, {
+        ...options,
+        credentials: "include",
+      });
+
+      //  if ( response.status === 401)  {
+      //       console.log("Unauthorized");
+
+      //       await refreshAccessToken();
+      //     }
+
+      //     if (user) {
+      //       return fetch(url, {
+      //         ...options,
+      //         credentials: "include",
+      //         },
+      //       )};
+
+      return response;
+    } else {
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          ...options?.headers,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      // if (response.status === 401) I need to refresh the token
+
+      return response;
+    }
+  };
 
   return (
     <AuthContext.Provider

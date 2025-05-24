@@ -1,9 +1,12 @@
 import LoginForm from "@/components/LoginForm";
 import { useAuth } from "@/context/auth";
+import { BASE_URL } from "@/utils/constants";
+import { useState } from "react";
 import { ActivityIndicator, Button, Image, Text, View } from "react-native";
 
 export default function Index() {
-  const { user, isLoading, signOut } = useAuth();
+  const { user, isLoading, signOut, fetchWithAuth } = useAuth();
+  const [data, setData] = useState();
 
   if (isLoading) {
     return (
@@ -23,6 +26,14 @@ export default function Index() {
     return <LoginForm />;
   }
 
+  async function getProtectedData() {
+    const response = await fetchWithAuth(`${BASE_URL}/api/protected/data`, {
+      method: "GET",
+    });
+
+    const data = await response.json();
+    setData(data);
+  }
   return (
     <View
       style={{
@@ -31,7 +42,6 @@ export default function Index() {
         alignItems: "center",
       }}
     >
-      {/* Imagem do usuário */}
       <Image
         source={{ uri: user.picture }}
         style={{ width: 96, height: 96, borderRadius: 48, marginBottom: 16 }}
@@ -39,8 +49,9 @@ export default function Index() {
       <Text>{user.sub}</Text>
       <Text>{user.name}</Text>
       <Text>{user.email}</Text>
-
       <Button title="Logout" onPress={() => signOut()} />
+      <Text>{JSON.stringify(data)}</Text>
+      <Button title="Fetch protected data" onPress={getProtectedData} />
     </View>
   );
 }
