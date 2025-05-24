@@ -77,6 +77,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           }
         } else {
           //mobile
+          const storedAccessToken = await tokenCache?.getToken(TOKEN_KEY_NAME);
+
+          if (storedAccessToken) {
+            try {
+              const decoded = jose.decodeJwt(storedAccessToken);
+              const exp = (decoded as any).exp;
+              const now = Math.floor(Date.now() / 1000);
+
+              if (exp && exp > now) {
+                console.log("Access token is still valid, using it");
+                setAccessToken(storedAccessToken);
+                setUser(decoded as AuthUser);
+              } else {
+                setUser(null);
+                tokenCache?.deleteToken(TOKEN_KEY_NAME);
+              }
+            } catch (e) {
+              console.log(e);
+            }
+          } else {
+            console.log("User is not authenticated");
+          }
         }
       } catch (e) {
         console.log(e);
