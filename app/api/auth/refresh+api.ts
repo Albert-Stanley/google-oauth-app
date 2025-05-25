@@ -19,6 +19,9 @@ import * as jose from "jose";
  * For native clients, it returns new tokens.
  */
 export async function POST(request: Request) {
+  console.log("Refresh API called. Method:", request.method);
+  console.log("Headers:", Object.fromEntries(request.headers.entries())); // Log all headers
+
   try {
     // Determine the platform (web or native)
     let platform = "native";
@@ -81,6 +84,8 @@ export async function POST(request: Request) {
         refreshToken = cookies[REFRESH_COOKIE_NAME];
       }
     }
+    console.log("Determined platform:", platform);
+    console.log("Refresh token found from body/cookie:", refreshToken);
 
     // If no refresh token found, try to use the access token as fallback
     if (!refreshToken) {
