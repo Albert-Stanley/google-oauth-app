@@ -1,5 +1,6 @@
 import { useAuth } from "@/context/auth";
-import { Image, StyleSheet, useColorScheme, View } from "react-native";
+import { StyleSheet, useColorScheme, View } from "react-native";
+import Footer from "./Footer";
 import SignInWithGoogleButton from "./SignInWithGoogleButton";
 import { ThemedText } from "./ThemedText";
 import { ThemedView } from "./ThemedView";
@@ -11,15 +12,6 @@ export default function LoginForm() {
   return (
     <ThemedView style={styles.container}>
       <View style={styles.card}>
-        <Image
-          source={
-            theme === "dark"
-              ? require("@/assets/images/icon-white.png")
-              : require("@/assets/images/icon-dark.png")
-          }
-          style={styles.logo}
-        />
-
         <View style={styles.contentContainer}>
           <View style={styles.titleContainer}>
             <ThemedText type="subtitle" style={styles.title}>
@@ -35,6 +27,7 @@ export default function LoginForm() {
             <SignInWithGoogleButton onPress={signIn} disabled={isLoading} />
           </View>
         </View>
+        <Footer />
       </View>
     </ThemedView>
   );
@@ -55,16 +48,16 @@ const styles = StyleSheet.create({
     width: "100%",
     maxWidth: 360,
     alignItems: "center",
-  },
-  logo: {
-    width: 100,
-    height: 100,
-    resizeMode: "contain",
-    marginBottom: 32,
+    justifyContent: "space-between",
+    paddingBottom: 20,
+    flex: 1,
   },
   contentContainer: {
     width: "100%",
     gap: 32,
+    alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
   },
   title: {
     textAlign: "center",
