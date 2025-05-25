@@ -43,33 +43,27 @@ A API de token detecta a plataforma e lida com a autenticação de forma apropri
 
 ## Fluxo de Autenticação Google OAuth 2.0
 
-![Fluxograma de Autenticação Google OAuth 2.0](assets/Fluxograma_Google_OAuth.png)
+![Fluxograma de Autenticação Google OAuth 2.0](assets/images/Fluxograma_Google_OAuth.png)
 
-
-## Configuração do Ambiente
-
-1.  Crie um arquivo `.env.local` na raiz do projeto com as seguintes variáveis:
-
-    ```bash
-    GOOGLE_CLIENT_ID=seu_client_id_google
-    GOOGLE_CLIENT_SECRET=seu_client_secret_google
-    JWT_SECRET=sua_chave_secreta_jwt # utilizada para assinar os tokens JWT
-    EXPO_PUBLIC_BASE_URL=sua_url_base # ex: http://localhost:8081 ou a URL do seu túnel de desenvolvimento (ex: ngrok)
-    EXPO_PUBLIC_SCHEME=seu_esquema_de_app:// # corresponde ao scheme em app.json (ex: myapp://)
-    ```
 
 ## Estrutura do Projeto
 
--   `/app` - Código principal da aplicação utilizando roteamento baseado em arquivos (Expo Router).
-    -   `/api` - Rotas de API do backend (BFF).
-        -   `/auth` - Endpoints de autenticação (ex: `/api/auth/google`, `/api/auth/token`).
-        -   `/public` - Endpoints públicos que não requerem autenticação.
-        -   `/protected` - Endpoints protegidos que requerem um token JWT válido.
--   `/components` - Componentes React reutilizáveis na sua aplicação.
--   `/utils` - Funções utilitárias, hooks personalizados e middleware.
--   `/assets` - Arquivos estáticos como imagens e fontes.
--   `app.json` - Arquivo de configuração do Expo.
--   `.env.local` - Arquivo para variáveis de ambiente locais (não versionado).
+## Estrutura do Projeto
+
+- `/app` - Código principal da aplicação, utilizando roteamento baseado em arquivos (Expo Router).
+- `/api` - Rotas de API do backend (BFF - Backend For Frontend).
+  - `/api/auth` - Endpoints de autenticação (ex: Google OAuth, troca de token).
+  - `/api/protected` - Endpoints protegidos que requerem um token JWT válido.
+- `/assets` - Arquivos estáticos como imagens, ícones e fontes.
+- `/components` - Componentes React reutilizáveis da aplicação.
+- `/constants` - Constantes globais para as cores.
+- `/context` - Contextos React para gerenciamento de estado global.
+- `/hooks` - Hooks React personalizados e reutilizáveis.
+- `/utils` - Funções utilitárias diversas e middlewares.
+- `app.json` - Arquivo de configuração principal do Expo.
+- `.env.local` - Arquivo para variáveis de ambiente locais (não versionado).
+
+---
 
 ---
 
