@@ -29,7 +29,7 @@ export default function ProtectedRequestCard() {
         borderRadius: 10,
       }}
     >
-      <ThemedText type="defaultSemiBold">Protected Request</ThemedText>
+      <ThemedText type="defaultSemiBold">Requisição Protegida</ThemedText>
       <ThemedText
         style={{
           fontFamily: "monospace",
@@ -39,9 +39,9 @@ export default function ProtectedRequestCard() {
           fontSize: 12,
         }}
       >
-        {data ? JSON.stringify(data, null, 2) : "No data fetched yet"}
+        {data ? JSON.stringify(data, null, 2) : "Nenhum dado foi buscado ainda"}
       </ThemedText>
-      <Button title="Fetch protected data" onPress={fetchProtectedData} />
+      <Button title="Buscar dados protegidos" onPress={fetchProtectedData} />
     </View>
   );
 }

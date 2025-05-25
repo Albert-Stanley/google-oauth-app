@@ -32,7 +32,7 @@ export default function SignInWithGoogleButton({
           }}
         />
         <ThemedText type="defaultSemiBold" darkColor="#000">
-          Continue with Google
+          Continue com Google
         </ThemedText>
       </View>
     </Pressable>

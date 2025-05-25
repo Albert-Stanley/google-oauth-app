@@ -25,21 +25,21 @@ export default function ProfileCard() {
     const secondsRemaining = timestamp - now;
 
     if (secondsRemaining <= 0) {
-      return "expired";
+      return "expirada";
     }
 
     // Convert to appropriate units
     if (secondsRemaining < 60) {
-      return `expires in ${secondsRemaining}s`;
+      return `expira em ${secondsRemaining}s`;
     } else if (secondsRemaining < 3600) {
       const minutes = Math.floor(secondsRemaining / 60);
-      return `expires in ${minutes}min`;
+      return `expira em ${minutes}min`;
     } else if (secondsRemaining < 86400) {
       const hours = Math.floor(secondsRemaining / 3600);
-      return `expires in ${hours}h`;
+      return `expira em ${hours}h`;
     } else {
       const days = Math.floor(secondsRemaining / 86400);
-      return `expires in ${days} day${days > 1 ? "s" : ""}`;
+      return `expira em ${days} dia${days > 1 ? "s" : ""}`;
     }
   };
 
@@ -85,7 +85,7 @@ export default function ProfileCard() {
             accessTokenExpiryRef.current = expTime;
             setAccessTokenExpiration(formatExpirationTime(expTime));
           } catch (e) {
-            console.error("Error decoding access token:", e);
+            console.error("Erro ao decodificar access token:", e);
           }
         }
 
@@ -98,7 +98,7 @@ export default function ProfileCard() {
             refreshTokenExpiryRef.current = expTime;
             setRefreshTokenExpiration(formatExpirationTime(expTime));
           } catch (e) {
-            console.error("Error decoding refresh token:", e);
+            console.error("Erro ao decodificar access token:", e);
           }
         }
       }
@@ -142,7 +142,7 @@ export default function ProfileCard() {
 
       <View>
         <ThemedText type="defaultSemiBold" style={{ textAlign: "center" }}>
-          {isWeb ? "Session" : "Access Token"}:
+          {isWeb ? "Sessão" : "Token de acesso"}:
         </ThemedText>
         <ThemedText type="defaultSemiBold" style={{ textAlign: "center" }}>
           {accessTokenExpiration !== null ? accessTokenExpiration : "..."}
@@ -152,7 +152,7 @@ export default function ProfileCard() {
       {!isWeb && (
         <View>
           <ThemedText type="defaultSemiBold" style={{ textAlign: "center" }}>
-            Refresh Token:
+            Token de renovação:
           </ThemedText>
           <ThemedText type="defaultSemiBold" style={{ textAlign: "center" }}>
             {refreshTokenExpiration !== null ? refreshTokenExpiration : "..."}
@@ -160,7 +160,7 @@ export default function ProfileCard() {
         </View>
       )}
 
-      <Button title="Sign Out" onPress={signOut} color={"red"} />
+      <Button title="Sair" onPress={signOut} color={"red"} />
     </View>
   );
 }

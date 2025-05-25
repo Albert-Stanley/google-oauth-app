@@ -3,7 +3,6 @@ import { Image, StyleSheet, useColorScheme, View } from "react-native";
 import SignInWithGoogleButton from "./SignInWithGoogleButton";
 import { ThemedText } from "./ThemedText";
 import { ThemedView } from "./ThemedView";
-// import { SignInWithAppleButton } from "./SignInWithAppleButton";
 
 export default function LoginForm() {
   const { signIn, isLoading } = useAuth();
@@ -24,17 +23,16 @@ export default function LoginForm() {
         <View style={styles.contentContainer}>
           <View style={styles.titleContainer}>
             <ThemedText type="subtitle" style={styles.title}>
-              Welcome to Your App
+              Bem-vindo(a) ao Seu App
             </ThemedText>
             <ThemedText style={styles.description}>
-              Experience seamless authentication{"\n"}
-              powered by Albert.{"\n"}
+              Experimente uma autenticação fluida{"\n"}
+              desenvolvida por Albert.{"\n"}
             </ThemedText>
           </View>
 
           <View style={styles.buttonContainer}>
             <SignInWithGoogleButton onPress={signIn} disabled={isLoading} />
-            {/* <SignInWithAppleButton /> */}
           </View>
         </View>
       </View>
@@ -70,7 +68,7 @@ const styles = StyleSheet.create({
   },
   title: {
     textAlign: "center",
-    fontSize: 30,
+    fontSize: 28,
   },
   buttonContainer: {
     width: "100%",
